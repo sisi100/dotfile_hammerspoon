@@ -1,12 +1,12 @@
 local kf = require "keyboard_func"
 
-
-kf.remapKey({'ctrl'}, 'j', kf.methodForceEngAndKey('escape'))
-kf.remapKey({'ctrl'}, 'm', kf.methodForceEngAndKey('return'))
+-- 半角英数へ変更
+kf.remapKey({'ctrl'}, 'j', kf.pushEisuuAfterAnyKey('escape'))
+kf.remapKey({'ctrl'}, 'm', kf.pushEisuuAfterAnyKey('return'))
 
 -- カーソル移動
-kf.remapKey({'ctrl'}, 'n', kf.keyCode('down'))
-kf.remapKey({'ctrl'}, 'p', kf.keyCode('up'))
+kf.remapKey({'ctrl'}, 'n', kf.pushModifierKey('down'))
+kf.remapKey({'ctrl'}, 'p', kf.pushModifierKey('up'))
 
 -- アプリケーションウィンドウ時の選択
 for i = 1, 9 do

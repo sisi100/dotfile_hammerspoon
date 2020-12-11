@@ -1,4 +1,4 @@
-local KEY_CODE_JIS_EISUU = 102
+local KEY_CODE_JIS_EISUU = 102 -- 半角英数
 
 
 local kf = {}
@@ -10,7 +10,7 @@ kf.remapKey = function(modifiers, key, keyCode)
 end
 
 -- 任意のキーの後に半角英数をタイプ
-kf.methodForceEngAndKey = function(key)
+kf.pushEisuuAfterAnyKey = function(key)
     return function()
         hs.alert.show(string.upper(key).." & ENG")
         hs.eventtap.event.newKeyEvent({}, string.lower(key), true):post()
@@ -18,8 +18,8 @@ kf.methodForceEngAndKey = function(key)
     end
 end
 
--- モディファイアとキーの同時タイプ
-kf.keyCode = function(key, modifiers)
+-- モディファイアとキーの同時タイプ(モディファイアは無くてもいい)
+kf.pushModifierKey = function(key, modifiers)
     modifiers = modifiers or {}
     return function()
         hs.eventtap.event.newKeyEvent(modifiers, string.lower(key), true):post()
