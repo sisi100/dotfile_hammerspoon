@@ -1,8 +1,4 @@
-local KEY_CODE_JIS_EISUU = 102 -- 半角英数
-
-
 local kf = {}
-
 
 -- キーバインドと関数を紐付ける
 kf.remapKey = function(modifiers, key, keyCode)
@@ -12,7 +8,7 @@ end
 -- 任意のキーの後に半角英数をタイプ
 kf.pushEisuuAfterAnyKey = function(key)
     return function()
-        hs.alert.show(string.upper(key).." & ENG")
+        hs.alert.show(string.upper(key) .. " & ENG")
         hs.eventtap.event.newKeyEvent({}, string.lower(key), true):post()
         hs.eventtap.event.newKeyEvent({}, KEY_CODE_JIS_EISUU, true):post()
     end
@@ -26,6 +22,12 @@ kf.pushModifierKey = function(key, modifiers)
     end
 end
 
+-- shellの実行結果を返す
+kf.executeShell = function(command)
+    return function()
+        hs.execute(command)
+    end
+end
 
 -- アプリケーションウィンドウ向け
 
@@ -33,16 +35,15 @@ end
 -- ※ただしいつでも叩けるので注意
 kf.moveAppWindow = function(number)
     return function()
-        hs.alert.show("MOVE:"..number)
+        hs.alert.show("MOVE:" .. number)
 
         -- 一度左に行ってから右に戻ると、経験則で左上へ移動する
-        hs.eventtap.event.newKeyEvent({}, string.lower('left'), true):post()
+        hs.eventtap.event.newKeyEvent({}, string.lower("left"), true):post()
         for i = 1, number do
-            hs.eventtap.event.newKeyEvent({}, string.lower('right'), true):post()
+            hs.eventtap.event.newKeyEvent({}, string.lower("right"), true):post()
         end
-        hs.eventtap.event.newKeyEvent({}, string.lower('return'), true):post()
+        hs.eventtap.event.newKeyEvent({}, string.lower("return"), true):post()
     end
 end
-
 
 return kf
