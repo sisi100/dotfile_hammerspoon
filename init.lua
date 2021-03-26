@@ -2,6 +2,12 @@ dofile("define.lua")
 dofile("mouse.lua")
 dofile("keyboard.lua")
 
+-- triggers
+for file in io.popen("ls triggers"):lines() do
+    dofile("triggers/"..file)
+end
+
+
 local kf = require "keyboard_func"
 
 -- [option]を2回叩くとlaunchpadを開く&英字
