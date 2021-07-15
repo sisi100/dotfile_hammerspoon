@@ -39,5 +39,5 @@ Hotkey.set(ctrl_m, windowMaximSize)
 -- イベントの設定
 local EventtapDoublePush = require "use_case.eventtap_double_push"
 
--- EventtapDoublePush.set(righOption, openLaunchpad)
+EventtapDoublePush.set(righOption, openLaunchpad)
 EventtapDoublePush.set(righCommand, openTerminal)
