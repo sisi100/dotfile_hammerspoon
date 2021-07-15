@@ -15,4 +15,4 @@ for i = 1, 9 do
 end
 
 -- ウィンドウ最大化
-hs.hotkey.bind({"cmd"}, "m", hs.grid.maximizeWindow)
+-- hs.hotkey.bind({"cmd"}, "m", hs.grid.maximizeWindow)

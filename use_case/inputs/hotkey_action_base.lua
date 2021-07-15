@@ -1,6 +1,6 @@
-local HotkeyActionInput = {}
+local HotkeyActionBase = {}
 
-HotkeyActionInput.new = function()
+HotkeyActionBase.new = function()
     local obj = {}
 
     -- キーボードを押したときの処理
@@ -15,4 +15,4 @@ HotkeyActionInput.new = function()
     return obj
 end
 
-return HotkeyActionInput
+return HotkeyActionBase

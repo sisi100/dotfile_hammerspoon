@@ -1,10 +1,10 @@
-local HotkeyActionInput = require "use_case.inputs.hotkey_action_input"
+local HotkeyActionBase = require "use_case.inputs.hotkey_action_base"
 
 local PushKeySet = require "use_case.actions.push_key_set"
 local PushKeySetInput = {}
 
 PushKeySetInput.new = function(keySet)
-    local obj = HotkeyActionInput.new()
+    local obj = HotkeyActionBase.new()
 
     obj.func = PushKeySet.new(keySet)
 
