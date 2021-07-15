@@ -1,4 +1,4 @@
-local HotkeyActionBase = require "use_case.inputs.hotkey_action_base"
+local HotkeyActionBase = require "use_case.inputs.bases.hotkey_action_base"
 
 local PushEisuuAfterAnyKey = require "use_case.actions.push_eisuu_after_any_key"
 local PushEisuuAfterAnyKeyInput = {}

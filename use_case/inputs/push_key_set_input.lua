@@ -1,4 +1,4 @@
-local HotkeyActionBase = require "use_case.inputs.hotkey_action_base"
+local HotkeyActionBase = require "use_case.inputs.bases.hotkey_action_base"
 
 local PushKeySet = require "use_case.actions.push_key_set"
 local PushKeySetInput = {}
