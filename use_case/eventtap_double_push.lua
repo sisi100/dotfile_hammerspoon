@@ -1,7 +1,6 @@
 local EventtapDoublePush = {}
 
 EventtapDoublePush.set = function(modifierKey, action)
-
 	local standby = false
 
 	local function cancel()

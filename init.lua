@@ -4,5 +4,5 @@ dofile("keyboard.lua")
 
 -- triggers
 for file in io.popen("ls triggers"):lines() do
-    dofile("triggers/"..file)
+    dofile("triggers/" .. file)
 end

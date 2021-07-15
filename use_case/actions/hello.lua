@@ -1,6 +1,6 @@
 local Hello = {}
 
-Hello.new =function(showMassage)
+Hello.new = function(showMassage)
     -- showMassage: string
     local func = function()
         hs.alert.show(showMassage)
@@ -10,5 +10,3 @@ Hello.new =function(showMassage)
 end
 
 return Hello
-
-
