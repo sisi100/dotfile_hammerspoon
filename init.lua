@@ -1,4 +1,3 @@
-dofile("define.lua")
 dofile("mouse.lua")
 dofile("keyboard.lua")
 
