@@ -5,31 +5,7 @@ kf.remapKey = function(modifiers, key, keyCode)
     hs.hotkey.bind(modifiers, key, keyCode, nil, keyCode)
 end
 
--- 任意のキーの後に半角英数をタイプ
-kf.pushEisuuAfterAnyKey = function(key)
-    return function()
-        hs.alert.show(string.upper(key) .. " & ENG")
-        hs.eventtap.event.newKeyEvent({}, string.lower(key), true):post()
-        hs.eventtap.event.newKeyEvent({}, KEY_CODE_JIS_EISUU, true):post()
-    end
-end
-
--- モディファイアとキーの同時タイプ(モディファイアは無くてもいい)
-kf.pushModifierKey = function(key, modifiers)
-    modifiers = modifiers or {}
-    return function()
-        hs.eventtap.event.newKeyEvent(modifiers, string.lower(key), true):post()
-    end
-end
-
--- shellの実行結果を返す
-kf.executeShell = function(command)
-    return function()
-        hs.execute(command)
-    end
-end
-
--- アプリケーションウィンドウ向け
+-- アプリケーションウィンドウ向け（暫定）
 
 -- アプリケーションウィンドウ起動時に左からｘ個目を指定する
 -- ※ただしいつでも叩けるので注意
