@@ -10,8 +10,11 @@ Hotkey.set = function(keySet, action)
 end
 
 Hotkey.setPressed = function(keySet, action)
+    -- キーをプッシュしたときのみアクションをする
+    -- Inputをいちいち作るのが面倒になったので実装！
+
     -- keySet: KeySet
-    -- action: ()
+    -- action: void
 
     local obj = HotkeyActionBase.new()
     obj.pressedFunc = action
