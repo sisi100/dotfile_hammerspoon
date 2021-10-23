@@ -37,7 +37,7 @@ Hotkey.set(ctrl_j, pushEisuuAndEscape)
 Hotkey.set(ctrl_p, pushUp)
 Hotkey.set(ctrl_n, pushDown)
 Hotkey.set(ctrl_m, windowMaximSize)
-Hotkey.setPressed(option_space, openMissionControl)
+-- Hotkey.setPressed(option_space, openMissionControl)
 
 -- イベントの設定
 local EventtapDoublePush = require "use_case.eventtap_double_push"
