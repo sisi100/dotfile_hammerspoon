@@ -2,11 +2,11 @@
 local KeySet = require "entities.key_set"
 local ModifierKey = require "entities.modifier_key"
 
-local ctrl_z = KeySet.new({"ctrl"}, "z")
 local ctrl_j = KeySet.new({"ctrl"}, "j")
 local ctrl_n = KeySet.new({"ctrl"}, "n")
 local ctrl_p = KeySet.new({"ctrl"}, "p")
 local ctrl_m = KeySet.new({"ctrl"}, "m")
+local command_m = KeySet.new({"command"}, "m") -- 既存だと`最小化`が入っているけれども、使わないし誤爆すると面倒なので上書きする
 local option_space = KeySet.new({"rightalt"}, "space")
 local up = KeySet.new({}, "up")
 local down = KeySet.new({}, "down")
@@ -32,7 +32,7 @@ local openMissionControl = ExecuteCommandInput.new("open -a 'Mission Control'")
 -- ホットキーに設定
 local Hotkey = require "use_case.hotkey"
 
-Hotkey.set(ctrl_z, showHelloWorld) -- 動作テスト
+Hotkey.set(command_m, showHelloWorld) -- 動作テスト
 Hotkey.set(ctrl_j, pushEisuuAndEscape)
 Hotkey.set(ctrl_p, pushUp)
 Hotkey.set(ctrl_n, pushDown)
