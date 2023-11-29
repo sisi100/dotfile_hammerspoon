@@ -6,6 +6,7 @@ local ctrl_j = KeySet.new({"ctrl"}, "j")
 local ctrl_n = KeySet.new({"ctrl"}, "n")
 local ctrl_p = KeySet.new({"ctrl"}, "p")
 local ctrl_m = KeySet.new({"ctrl"}, "m")
+
 local command_m = KeySet.new({"command"}, "m") -- 既存だと`最小化`が入っているけれども、使わないし誤爆すると面倒なので上書きする
 local option_space = KeySet.new({"rightalt"}, "space")
 local up = KeySet.new({}, "up")
@@ -36,11 +37,13 @@ Hotkey.set(command_m, showHelloWorld) -- 動作テスト
 Hotkey.set(ctrl_j, pushEisuuAndEscape)
 Hotkey.set(ctrl_p, pushUp)
 Hotkey.set(ctrl_n, pushDown)
-Hotkey.set(ctrl_m, windowMaximSize)
+-- Hotkey.set(ctrl_m, windowMaximSize)
 -- Hotkey.setPressed(option_space, openMissionControl)
+-- Hotkey.set(command_m,PushKeyInput.new(KeySet.new({"ctrl", "command"}, "1")))
 
 -- イベントの設定
 local EventtapDoublePush = require "use_case.eventtap_double_push"
 
+-- ダブルクリック
 EventtapDoublePush.set(righOption, openLaunchpad)
 EventtapDoublePush.set(righCommand, openTerminal)
