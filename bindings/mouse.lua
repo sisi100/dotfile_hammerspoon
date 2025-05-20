@@ -2,51 +2,78 @@
 local Mouse = {}
 
 -- 設定値
-local SCROLL_MULTIPLIER = -4  -- スクロール速度の倍率
-local SHOW_ALERTS = true      -- アラート表示の有効/無効
+local CONFIG = {
+    SCROLL = {
+        MULTIPLIER = -4,  -- スクロール速度の倍率
+    },
+    UI = {
+        SHOW_ALERTS = true,  -- アラート表示の有効/無効
+    },
+    EVENTS = {
+        DOUBLE_CLICK_TIMEOUT = 0.5,  -- ダブルクリック判定のタイムアウト（秒）
+    }
+}
 
 -- 内部状態
-local isDeferred = false      -- 右クリックの遅延状態
-local oldMousePosition = {}   -- マウス位置の保存用
+local State = {
+    isDeferred = false,      -- 右クリックの遅延状態
+    oldMousePosition = {},   -- マウス位置の保存用
+    eventListeners = {}      -- イベントリスナーの管理
+}
+
+-- イベントリスナーの管理
+local function startEventListeners()
+    for _, listener in pairs(State.eventListeners) do
+        listener:start()
+    end
+end
+
+local function stopEventListeners()
+    for _, listener in pairs(State.eventListeners) do
+        listener:stop()
+    end
+end
 
 -- マウスモジュールの初期化
 function Mouse.init()
-    Mouse.overrideRightMouseDown:start()
-    Mouse.overrideRightMouseUp:start()
-    Mouse.dragRightToScroll:start()
+    startEventListeners()
 end
 
 -- 右クリックボタンダウンイベント
-Mouse.overrideRightMouseDown = hs.eventtap.new(
+State.eventListeners.rightMouseDown = hs.eventtap.new(
     {hs.eventtap.event.types.rightMouseDown},
     function(event)
-        if SHOW_ALERTS then
+        if CONFIG.UI.SHOW_ALERTS then
             hs.alert.show("down")
         end
-        isDeferred = true
+        State.isDeferred = true
         return true
     end
 )
 
 -- 右クリックボタンアップイベント
-Mouse.overrideRightMouseUp = hs.eventtap.new(
+State.eventListeners.rightMouseUp = hs.eventtap.new(
     {hs.eventtap.event.types.rightMouseUp},
     function(event)
-        if SHOW_ALERTS then
+        if CONFIG.UI.SHOW_ALERTS then
             hs.alert.show("up")
         end
 
-        if isDeferred then
+        if State.isDeferred then
             -- イベントリスナーを一時停止
-            Mouse.overrideRightMouseDown:stop()
-            Mouse.overrideRightMouseUp:stop()
+            stopEventListeners()
 
             -- 右クリックイベントを発火
-            hs.eventtap.rightClick(event:location())
+            local success, err = pcall(function()
+                hs.eventtap.rightClick(event:location())
+            end)
+
+            if not success then
+                hs.alert.show("右クリックイベントの実行に失敗しました: " .. tostring(err))
+            end
 
             -- イベントリスナーを再開
-            Mouse.overrideRightMouseDown:start()
-            Mouse.overrideRightMouseUp:start()
+            startEventListeners()
             return true
         end
         return false
@@ -54,11 +81,11 @@ Mouse.overrideRightMouseUp = hs.eventtap.new(
 )
 
 -- 右クリックドラッグでスクロールイベント
-Mouse.dragRightToScroll = hs.eventtap.new(
+State.eventListeners.rightMouseDragged = hs.eventtap.new(
     {hs.eventtap.event.types.rightMouseDragged},
     function(event)
-        isDeferred = false
-        oldMousePosition = hs.mouse.absolutePosition()
+        State.isDeferred = false
+        State.oldMousePosition = hs.mouse.absolutePosition()
 
         -- マウスの移動量を取得
         local deltaX = event:getProperty(hs.eventtap.event.properties["mouseEventDeltaX"])
@@ -66,16 +93,33 @@ Mouse.dragRightToScroll = hs.eventtap.new(
 
         -- スクロールイベントを作成
         local scrollEvent = hs.eventtap.event.newScrollEvent(
-            {deltaX * SCROLL_MULTIPLIER, deltaY * SCROLL_MULTIPLIER},
+            {deltaX * CONFIG.SCROLL.MULTIPLIER, deltaY * CONFIG.SCROLL.MULTIPLIER},
             {},
             "pixel"
         )
 
         -- マウス位置を元に戻す
-        hs.mouse.absolutePosition(oldMousePosition)
+        local success, err = pcall(function()
+            hs.mouse.absolutePosition(State.oldMousePosition)
+        end)
+
+        if not success then
+            hs.alert.show("マウス位置の復元に失敗しました: " .. tostring(err))
+        end
 
         return true, {scrollEvent}
     end
 )
+
+-- 設定の更新
+function Mouse.updateConfig(newConfig)
+    for category, values in pairs(newConfig) do
+        if CONFIG[category] then
+            for key, value in pairs(values) do
+                CONFIG[category][key] = value
+            end
+        end
+    end
+end
 
 return Mouse
