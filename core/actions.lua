@@ -66,18 +66,4 @@ Actions.doubleTapModifier = function(modifierKey, action)
     end
 end
 
--- アプリケーションウィンドウを指定位置に移動するアクション
-Actions.moveAppWindow = function(number)
-    return function()
-        hs.alert.show("MOVE:" .. number)
-
-        -- 一度左に行ってから右に戻ると、経験則で左上へ移動する
-        hs.eventtap.event.newKeyEvent({}, string.lower("left"), true):post()
-        for i = 1, number do
-            hs.eventtap.event.newKeyEvent({}, string.lower("right"), true):post()
-        end
-        hs.eventtap.event.newKeyEvent({}, string.lower("return"), true):post()
-    end
-end
-
 return Actions

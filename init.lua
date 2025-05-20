@@ -6,7 +6,7 @@ local initKeyBindings = require("bindings.key")
 initKeyBindings()
 
 -- モジュールの読み込み
-local Mouse = require("core.mouse")
+local Mouse = require("bindings.mouse")
 
 -- マウスモジュールの初期化
 Mouse.init()
