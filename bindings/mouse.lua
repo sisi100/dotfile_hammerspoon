@@ -1,14 +1,16 @@
 -- マウス関連の機能を管理するモジュール
 local Mouse = {}
 
--- 設定
-local deferred = false
-local oldmousepos = {}
-local scrollmult = -4
+-- 設定値
+local SCROLL_MULTIPLIER = -4  -- スクロール速度の倍率
+local SHOW_ALERTS = true      -- アラート表示の有効/無効
+
+-- 内部状態
+local isDeferred = false      -- 右クリックの遅延状態
+local oldMousePosition = {}   -- マウス位置の保存用
 
 -- マウスモジュールの初期化
 function Mouse.init()
-    -- イベントリスナーの開始
     Mouse.overrideRightMouseDown:start()
     Mouse.overrideRightMouseUp:start()
     Mouse.dragRightToScroll:start()
@@ -17,9 +19,11 @@ end
 -- 右クリックボタンダウンイベント
 Mouse.overrideRightMouseDown = hs.eventtap.new(
     {hs.eventtap.event.types.rightMouseDown},
-    function(e)
-        hs.alert.show("down")
-        deferred = true
+    function(event)
+        if SHOW_ALERTS then
+            hs.alert.show("down")
+        end
+        isDeferred = true
         return true
     end
 )
@@ -27,12 +31,20 @@ Mouse.overrideRightMouseDown = hs.eventtap.new(
 -- 右クリックボタンアップイベント
 Mouse.overrideRightMouseUp = hs.eventtap.new(
     {hs.eventtap.event.types.rightMouseUp},
-    function(e)
-        hs.alert.show("up")
-        if (deferred) then
+    function(event)
+        if SHOW_ALERTS then
+            hs.alert.show("up")
+        end
+
+        if isDeferred then
+            -- イベントリスナーを一時停止
             Mouse.overrideRightMouseDown:stop()
             Mouse.overrideRightMouseUp:stop()
-            hs.eventtap.rightClick(e:location())
+
+            -- 右クリックイベントを発火
+            hs.eventtap.rightClick(event:location())
+
+            -- イベントリスナーを再開
             Mouse.overrideRightMouseDown:start()
             Mouse.overrideRightMouseUp:start()
             return true
@@ -44,14 +56,25 @@ Mouse.overrideRightMouseUp = hs.eventtap.new(
 -- 右クリックドラッグでスクロールイベント
 Mouse.dragRightToScroll = hs.eventtap.new(
     {hs.eventtap.event.types.rightMouseDragged},
-    function(e)
-        deferred = false
-        oldmousepos = hs.mouse.absolutePosition()
-        local dx = e:getProperty(hs.eventtap.event.properties["mouseEventDeltaX"])
-        local dy = e:getProperty(hs.eventtap.event.properties["mouseEventDeltaY"])
-        local scroll = hs.eventtap.event.newScrollEvent({dx * scrollmult, dy * scrollmult}, {}, "pixel")
-        hs.mouse.absolutePosition(oldmousepos)
-        return true, {scroll}
+    function(event)
+        isDeferred = false
+        oldMousePosition = hs.mouse.absolutePosition()
+
+        -- マウスの移動量を取得
+        local deltaX = event:getProperty(hs.eventtap.event.properties["mouseEventDeltaX"])
+        local deltaY = event:getProperty(hs.eventtap.event.properties["mouseEventDeltaY"])
+
+        -- スクロールイベントを作成
+        local scrollEvent = hs.eventtap.event.newScrollEvent(
+            {deltaX * SCROLL_MULTIPLIER, deltaY * SCROLL_MULTIPLIER},
+            {},
+            "pixel"
+        )
+
+        -- マウス位置を元に戻す
+        hs.mouse.absolutePosition(oldMousePosition)
+
+        return true, {scrollEvent}
     end
 )
 

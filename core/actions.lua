@@ -28,17 +28,21 @@ end
 -- アプリケーションを起動するアクション
 Actions.openApplication = function(appName)
     return function()
-        hs.eventtap.event.newKeyEvent({}, "eisu", true):post() -- 英数に戻す
+        -- 英数入力に切り替え
+        hs.eventtap.event.newKeyEvent({}, "eisu", true):post()
+        -- アプリケーションを起動
         hs.execute("open -a " .. appName)
     end
 end
 
 -- 修飾キーを2回押したときのアクション
 Actions.doubleTapModifier = function(modifierKey, action)
-    local standby = false
+    local isStandby = false
+    local DOUBLE_TAP_TIMEOUT = 0.5  -- ダブルタップの判定時間（秒）
 
-    local function cancel()
-        standby = false
+    -- スタンバイ状態を解除
+    local function cancelStandby()
+        isStandby = false
     end
 
     return function(event)
@@ -48,18 +52,21 @@ Actions.doubleTapModifier = function(modifierKey, action)
 
         if event:getType() == hs.eventtap.event.types.flagsChanged then
             if flags[fixKey] then
+                -- 修飾キーが正しくない場合はキャンセル
                 if keyCode ~= modifierKey.modifier then
-                    cancel()
+                    cancelStandby()
                     return
                 end
 
-                if (not standby) then
-                    standby = true
-                    hs.timer.doAfter(0.5, cancel)
+                -- 初回タップの場合
+                if not isStandby then
+                    isStandby = true
+                    hs.timer.doAfter(DOUBLE_TAP_TIMEOUT, cancelStandby)
                     return
                 end
 
-                cancel()
+                -- ダブルタップの実行
+                cancelStandby()
                 action()
             end
         end
