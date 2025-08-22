@@ -75,56 +75,50 @@ end
 
 -- 修飾キーのダブルタップ状態を管理
 local function getDoubleTapState(modifierKey)
-    if not State.doubleTapStates[modifierKey.modifier] then
-        State.doubleTapStates[modifierKey.modifier] = {
+    local key = modifierKey.modifier
+    if not State.doubleTapStates[key] then
+        State.doubleTapStates[key] = {
             isStandby = false,
             timer = nil
         }
     end
-    return State.doubleTapStates[modifierKey.modifier]
+    return State.doubleTapStates[key]
 end
 
 -- スタンバイ状態を解除
 local function cancelStandby(state)
     if state.timer then
         state.timer:stop()
+        state.timer = nil
     end
     state.isStandby = false
-    state.timer = nil
 end
 
 -- 修飾キーを2回押したときのアクション
 Actions.doubleTapModifier = function(modifierKey, action)
+    local state = getDoubleTapState(modifierKey)
+
     return function(event)
-        local keyCode = hs.keycodes.map[event:getKeyCode()]
+        local eventType = event:getType()
         local flags = event:getFlags()
         local fixKey = string.gsub(modifierKey.modifier, "right", "")
 
-        if event:getType() == hs.eventtap.event.types.flagsChanged then
-            if flags[fixKey] then
-                -- 修飾キーが正しくない場合はキャンセル
-                if keyCode ~= modifierKey.modifier then
-                    cancelStandby(getDoubleTapState(modifierKey))
-                    return
-                end
+        -- 修飾キーが押された時
+        if eventType == hs.eventtap.event.types.flagsChanged and flags[fixKey] then
+            -- 初回タップの場合
+            if not state.isStandby then
+                state.isStandby = true
+                state.timer = hs.timer.doAfter(CONFIG.KEYBOARD.DOUBLE_TAP_TIMEOUT, function()
+                    cancelStandby(state)
+                end)
+                return
+            end
 
-                local state = getDoubleTapState(modifierKey)
-
-                -- 初回タップの場合
-                if not state.isStandby then
-                    state.isStandby = true
-                    state.timer = hs.timer.doAfter(CONFIG.KEYBOARD.DOUBLE_TAP_TIMEOUT, function()
-                        cancelStandby(state)
-                    end)
-                    return
-                end
-
-                -- ダブルタップの実行
-                cancelStandby(state)
-                local success, err = pcall(action)
-                if not success then
-                    hs.alert.show("アクションの実行に失敗しました: " .. tostring(err))
-                end
+            -- ダブルタップの実行
+            cancelStandby(state)
+            local success, err = pcall(action)
+            if not success then
+                hs.alert.show("アクションの実行に失敗しました: " .. tostring(err))
             end
         end
     end
@@ -132,13 +126,21 @@ end
 
 -- 設定の更新
 function Actions.updateConfig(newConfig)
+    if type(newConfig) ~= "table" then
+        return false, "設定はテーブルである必要があります"
+    end
+
     for category, values in pairs(newConfig) do
-        if CONFIG[category] then
+        if CONFIG[category] and type(values) == "table" then
             for key, value in pairs(values) do
-                CONFIG[category][key] = value
+                if CONFIG[category][key] ~= nil then
+                    CONFIG[category][key] = value
+                end
             end
         end
     end
+
+    return true
 end
 
 return Actions
