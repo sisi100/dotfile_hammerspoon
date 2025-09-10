@@ -96,15 +96,26 @@ end
 
 -- 修飾キーを2回押したときのアクション
 Actions.doubleTapModifier = function(modifierKey, action)
-    local state = getDoubleTapState(modifierKey)
-
     return function(event)
+        -- イベントの検証
+        if not event or not event.getType or not event.getFlags then
+            return
+        end
+
         local eventType = event:getType()
         local flags = event:getFlags()
         local fixKey = string.gsub(modifierKey.modifier, "right", "")
 
-        -- 修飾キーが押された時
+        -- 修飾キーが押された時のみ処理
         if eventType == hs.eventtap.event.types.flagsChanged and flags[fixKey] then
+            local state = getDoubleTapState(modifierKey)
+
+            -- 既存のタイマーがあれば停止
+            if state.timer then
+                state.timer:stop()
+                state.timer = nil
+            end
+
             -- 初回タップの場合
             if not state.isStandby then
                 state.isStandby = true
@@ -118,10 +129,27 @@ Actions.doubleTapModifier = function(modifierKey, action)
             cancelStandby(state)
             local success, err = pcall(action)
             if not success then
-                hs.alert.show("アクションの実行に失敗しました: " .. tostring(err))
+                if CONFIG.UI.SHOW_ALERTS then
+                    hs.alert.show("アクションの実行に失敗しました: " .. tostring(err))
+                end
             end
         end
     end
+end
+
+-- 状態のリセット
+function Actions.resetState()
+    -- 全てのタイマーを停止
+    for modifier, state in pairs(State.doubleTapStates) do
+        if state.timer then
+            state.timer:stop()
+            state.timer = nil
+        end
+        state.isStandby = false
+    end
+
+    -- 状態テーブルをクリア
+    State.doubleTapStates = {}
 end
 
 -- 設定の更新
@@ -141,6 +169,23 @@ function Actions.updateConfig(newConfig)
     end
 
     return true
+end
+
+-- デバッグ用：現在の状態を表示
+function Actions.getDebugInfo()
+    local info = {
+        config = CONFIG,
+        state = {}
+    }
+
+    for modifier, state in pairs(State.doubleTapStates) do
+        info.state[modifier] = {
+            isStandby = state.isStandby,
+            hasTimer = state.timer ~= nil
+        }
+    end
+
+    return info
 end
 
 return Actions

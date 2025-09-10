@@ -42,20 +42,69 @@ local function setupHotkeys()
     -- hs.hotkey.bind(option_space.modifiers, option_space.key, openMissionControl) -- 右Option+SpaceでMission Control
 end
 
+-- イベントタップの管理
+local eventTaps = {}
+
 -- イベントの設定
 local function setupEvents()
+    -- 既存のイベントタップを停止
+    for _, eventTap in pairs(eventTaps) do
+        if eventTap then
+            eventTap:stop()
+        end
+    end
+    eventTaps = {}
+
+    -- 状態をリセット
+    Actions.resetState()
+
     -- 修飾キーのダブルクリック設定
-    local rightOptionEvent = hs.eventtap.new(
+    eventTaps.rightOption = hs.eventtap.new(
         {hs.eventtap.event.types.flagsChanged},
         Actions.doubleTapModifier(righOption, openLaunchpad)
     )
-    rightOptionEvent:start()
+    eventTaps.rightOption:start()
 
-    local rightCommandEvent = hs.eventtap.new(
+    eventTaps.rightCommand = hs.eventtap.new(
         {hs.eventtap.event.types.flagsChanged},
         Actions.doubleTapModifier(righCommand, openTerminal)
     )
-    rightCommandEvent:start()
+    eventTaps.rightCommand:start()
+
+    -- 定期的なクリーンアップ（5分ごと）
+    if not eventTaps.cleanupTimer then
+        eventTaps.cleanupTimer = hs.timer.doEvery(300, function()
+            Actions.resetState()
+        end)
+    end
+end
+
+-- クリーンアップ関数
+local function cleanup()
+    -- イベントタップを停止
+    for _, eventTap in pairs(eventTaps) do
+        if eventTap then
+            eventTap:stop()
+        end
+    end
+    eventTaps = {}
+
+    -- 状態をリセット
+    Actions.resetState()
+end
+
+-- デバッグ関数
+local function debug()
+    local info = Actions.getDebugInfo()
+    hs.alert.show("デバッグ情報: " .. hs.json.encode(info, true))
+end
+
+-- 再初期化関数
+local function reinit()
+    cleanup()
+    setupHotkeys()
+    setupEvents()
+    hs.alert.show("設定を再読み込みしました")
 end
 
 -- 初期化関数
@@ -63,5 +112,10 @@ local function init()
     setupHotkeys()
     setupEvents()
 end
+
+-- グローバル関数として公開
+hs.cleanup = cleanup
+hs.debug = debug
+hs.reinit = reinit
 
 return init
