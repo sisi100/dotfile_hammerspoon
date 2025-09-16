@@ -10,7 +10,7 @@ local CONFIG = {
         SHOW_ALERTS = true,  -- アラート表示の有効/無効
     },
     EVENTS = {
-        DOUBLE_CLICK_TIMEOUT = 0.5,  -- ダブルクリック判定のタイムアウト（秒）
+        DOUBLE_CLICK_TIMEOUT = 0.2,  -- ダブルクリック判定のタイムアウト（秒）
     }
 }
 

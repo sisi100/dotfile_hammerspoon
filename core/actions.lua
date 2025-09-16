@@ -5,7 +5,7 @@ local Actions = {}
 -- 設定値
 local CONFIG = {
     KEYBOARD = {
-        DOUBLE_TAP_TIMEOUT = 0.5,  -- ダブルタップの判定時間（秒）
+        DOUBLE_TAP_TIMEOUT = 0.2,  -- ダブルタップの判定時間（秒）
     },
     UI = {
         SHOW_ALERTS = true,  -- アラート表示の有効/無効
@@ -104,10 +104,35 @@ Actions.doubleTapModifier = function(modifierKey, action)
 
         local eventType = event:getType()
         local flags = event:getFlags()
-        local fixKey = string.gsub(modifierKey.modifier, "right", "")
+        local keyCode = event:getKeyCode()
+
+        -- デバッグ用：キーコードとフラグの内容を表示（無効化）
+        -- if CONFIG.UI.SHOW_ALERTS then
+        --     local flagInfo = {}
+        --     for k, v in pairs(flags) do
+        --         if v then
+        --             table.insert(flagInfo, k)
+        --         end
+        --     end
+        --     hs.alert.show("キーコード: " .. keyCode .. ", フラグ: " .. table.concat(flagInfo, ", "))
+        -- end
+
+        -- 左右の修飾キーを区別するためのチェック
+        local isTargetModifier = false
+        if modifierKey.modifier == "rightalt" then
+            -- 右オプションキーの場合：altフラグがtrueで、キーコードが61（右オプション）かチェック
+            isTargetModifier = flags.alt and keyCode == 61
+        elseif modifierKey.modifier == "rightcmd" then
+            -- 右コマンドキーの場合：cmdフラグがtrueで、キーコードが54（右コマンド）かチェック
+            isTargetModifier = flags.cmd and keyCode == 54
+        else
+            -- その他の修飾キーの場合（従来の動作）
+            local fixKey = string.gsub(modifierKey.modifier, "right", "")
+            isTargetModifier = flags[fixKey]
+        end
 
         -- 修飾キーが押された時のみ処理
-        if eventType == hs.eventtap.event.types.flagsChanged and flags[fixKey] then
+        if eventType == hs.eventtap.event.types.flagsChanged and isTargetModifier then
             local state = getDoubleTapState(modifierKey)
 
             -- 既存のタイマーがあれば停止
