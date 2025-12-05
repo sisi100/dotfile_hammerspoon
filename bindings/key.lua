@@ -36,9 +36,9 @@ local function setupHotkeys()
     -- キーバインドの設定
     hs.hotkey.bind(command_m.modifiers, command_m.key, showHelloWorld) -- 動作テスト
     hs.hotkey.bind(ctrl_j.modifiers, ctrl_j.key, pushEisuuAndEscape) -- Ctrl+JでEscapeキーを押して英数入力に切り替え
-    hs.hotkey.bind(ctrl_p.modifiers, ctrl_p.key, pushUp) -- Ctrl+Pで上矢印キー
-    hs.hotkey.bind(ctrl_n.modifiers, ctrl_n.key, pushDown) -- Ctrl+Nで下矢印キー
-    -- hs.hotkey.bind(ctrl_m.modifiers, ctrl_m.key, windowMaximSize) -- Ctrl+Mでウィンドウを最大化
+    hs.hotkey.bind(ctrl_p.modifiers, ctrl_p.key, pushUp, nil, pushUp) -- Ctrl+Pで上矢印キー（リピート対応）
+    hs.hotkey.bind(ctrl_n.modifiers, ctrl_n.key, pushDown, nil, pushDown) -- Ctrl+Nで下矢印キー（リピート対応）
+    hs.hotkey.bind(ctrl_m.modifiers, ctrl_m.key, windowMaximSize) -- Ctrl+Mでウィンドウを最大化
     -- hs.hotkey.bind(option_space.modifiers, option_space.key, openMissionControl) -- 右Option+SpaceでMission Control
 end
 
